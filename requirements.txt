@@ -1,0 +1,11 @@
+pygame
+tf-nightly
+tf-keras-nightly
+tfp-nightly
+dm-reverb-nightly
+mss
+opencv-python
+python-xlib
+tk
+pyautogui
+easyocr
