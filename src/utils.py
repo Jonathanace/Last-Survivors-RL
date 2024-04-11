@@ -213,16 +213,17 @@ def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
         image = screenshot()
     elif isinstance(image_or_image_path, str):
-        pass
-    else:
         image = cv2.imread(image_or_image_path)
+    else:
+        image = image_or_image_path
     try:
-        pag.locateOnScreen('images/templates/menu/confirm_button.png')
+        pag.locate('images/templates/menu/confirm_button.png', image)
         return True
     except:
         return False
 
-def check_win_or_loss(image_or_image_path=None):
+def check_win_or_loss(image_or_image_path=None, confidence=0.8):
+    # Load Image
     if image_or_image_path is None:
         image = screenshot()
     elif isinstance(image_or_image_path, str):
@@ -230,10 +231,23 @@ def check_win_or_loss(image_or_image_path=None):
         image = cv2.imread(image_or_image_path)
     else:
         image = image_or_image_path
-    
-    try:
-        pag.locate('lose_template.png', image, confidence=0.8)
-        print('Found!')
-    except:
-        print('Not found')
 
+    if not check_game_end(image):
+        raise Exception("The game hasn't ended yet!")
+
+    # Check if Win or Loss
+    try:
+        pag.locate('images/templates/menu/win_template.png', image, confidence=confidence)
+        # print('Win found')
+        return 1
+    except:
+        pass
+
+    try:
+        pag.locate('images/templates/menu/lose_template.png', image, confidence=confidence)
+        # print('Loss found')
+        return -1
+    except:
+        pass
+
+    raise Exception("Game has ended but neither win or loss detected!")
