@@ -221,3 +221,19 @@ def check_game_end(image_or_image_path=None):
         return True
     except:
         return False
+
+def check_win_or_loss(image_or_image_path=None):
+    if image_or_image_path is None:
+        image = screenshot()
+    elif isinstance(image_or_image_path, str):
+        print('Image str provided')
+        image = cv2.imread(image_or_image_path)
+    else:
+        image = image_or_image_path
+    
+    try:
+        pag.locate('lose_template.png', image, confidence=0.8)
+        print('Found!')
+    except:
+        print('Not found')
+
