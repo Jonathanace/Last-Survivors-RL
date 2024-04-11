@@ -10,6 +10,7 @@ import os
 import numpy as np
 import pyautogui as pag
 import cv2
+import time
 
 ability_names = [
     'Arc Lightning',
@@ -212,11 +213,7 @@ def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
         image = screenshot()
     try:
-        pag.locateOnScreen('templates/menu/confirm_button.png')
+        pag.locateOnScreen('images/templates/menu/confirm_button.png')
         return True
     except:
         return False
-
-screenshot(file_path='test.png')
-check_game_end()
-
