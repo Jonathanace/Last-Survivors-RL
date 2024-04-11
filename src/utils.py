@@ -132,8 +132,6 @@ for i, name in enumerate(namespace):
     encoder_dict[name] = i+1
     if name not in file_names:
         missing_files += 1
-        print(f'Warning: {name} has no corresponding image!')
-print(f'{num_files-missing_files}/{num_files} images loaded')
 
 def validate_icons():
     missing_files = 0
@@ -147,15 +145,15 @@ lookUpTable = np.empty((1,256), np.uint8)
 for i in range(256): # populate lookUpTable
     lookUpTable[0,i] = np.clip(pow(i / 255.0, 1.0) * 255.0, 0, 255)
 
-def screenshot(save=True, region=(1550,290, 370, 550), filename="screenshot.png"):
+def screenshot(file_path=None, region=(1550,290, 370, 550)):
     """
     region: a four-integer tuple of the left, top, width, and height of the region to capture
     """
     screenshot = pag.screenshot(region=region) 
     image = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
     gamma_image = cv2.LUT(image, lookUpTable)
-    if save:
-        cv2.imwrite(filename, gamma_image) 
+    if file_path:
+        cv2.imwrite(file_path, gamma_image) 
     return gamma_image
 
 def quickshow(image):
@@ -212,12 +210,13 @@ def get_choices(image_or_image_path=None, icons_dir="./icons", confidence_thresh
 
 def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
-        image = screenshot(save=False)
+        image = screenshot()
     try:
         pag.locateOnScreen('templates/menu/confirm_button.png')
         return True
     except:
         return False
 
+screenshot(file_path='test.png')
 check_game_end()
 
