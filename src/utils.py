@@ -212,6 +212,10 @@ def get_choices(image_or_image_path=None, icons_dir="./icons", confidence_thresh
 def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
         image = screenshot()
+    elif isinstance(image_or_image_path, str):
+        pass
+    else:
+        image = cv2.imread(image_or_image_path)
     try:
         pag.locateOnScreen('images/templates/menu/confirm_button.png')
         return True
