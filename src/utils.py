@@ -147,7 +147,6 @@ lookUpTable = np.empty((1,256), np.uint8)
 for i in range(256): # populate lookUpTable
     lookUpTable[0,i] = np.clip(pow(i / 255.0, 1.0) * 255.0, 0, 255)
 
-
 def screenshot(save=True, region=(1550,290, 370, 550), filename="screenshot.png"):
     """
     region: a four-integer tuple of the left, top, width, and height of the region to capture
@@ -166,7 +165,6 @@ def quickshow(image):
     cv2.imshow('pic', image)
     cv2.waitKey(4_000)
     cv2.destroyAllWindows()
-
 
 def get_choices(image_or_image_path=None, icons_dir="./icons", confidence_threshold=0.70):
     """
@@ -215,5 +213,11 @@ def get_choices(image_or_image_path=None, icons_dir="./icons", confidence_thresh
 def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
         image = screenshot(save=False)
-    
+    try:
+        pag.locateOnScreen('templates/menu/confirm_button.png')
+        return True
+    except:
+        return False
+
+check_game_end()
 
