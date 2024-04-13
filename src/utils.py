@@ -121,7 +121,7 @@ other_choice_names = [
 ]
 namespace = ability_names + item_names + other_choice_names 
 
-icons_dir="./icons"
+icons_dir="images/templates/choices"
 pathlist = Path(icons_dir).rglob('*')
 file_names = {os.path.basename(path)[:-4] for path in pathlist}
 
@@ -146,7 +146,7 @@ lookUpTable = np.empty((1,256), np.uint8)
 for i in range(256): # populate lookUpTable
     lookUpTable[0,i] = np.clip(pow(i / 255.0, 1.0) * 255.0, 0, 255)
 
-def screenshot(file_path=None, region=(1550,290, 370, 550)):
+def screenshot(file_path=None, region=None):
     """
     region: a four-integer tuple of the left, top, width, and height of the region to capture
     """
@@ -165,13 +165,13 @@ def quickshow(image):
     cv2.waitKey(4_000)
     cv2.destroyAllWindows()
 
-def get_choices(image_or_image_path=None, icons_dir="./icons", confidence_threshold=0.70):
+def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_threshold=0.70):
     """
     Returns: A list of the names of current choices
     """
     ### Initialize
     if image_or_image_path is None:
-        image = cv2.imread("screenshot.png")
+        image = screenshot(region=(1550,290, 370, 550))
     items = {} # rounded y: (name, confidence)
     
     ### Get Choices
@@ -251,3 +251,13 @@ def check_win_or_loss(image_or_image_path=None, confidence=0.8):
         pass
 
     raise Exception("Game has ended but neither win or loss detected!")
+
+def start_dummy_run():
+    validate_icons()
+    while True:
+        print(f'choices: {get_choices()}')
+        if check_game_end():
+            print(f'game ended.')
+            print('Reward:', check_win_or_loss())
+            break
+        time.sleep(1)
