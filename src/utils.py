@@ -11,6 +11,7 @@ import numpy as np
 import pyautogui as pag
 import cv2
 import time
+import torch
 
 ability_names = [
     'Arc Lightning',
@@ -208,6 +209,9 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         print(item)
     
     return [item[0] for item in sorted_items]
+
+def encode_choices(choices):
+    return
 
 def check_game_end(image_or_image_path=None):
     if image_or_image_path is None:
