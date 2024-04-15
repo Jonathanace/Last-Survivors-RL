@@ -12,6 +12,7 @@ import pyautogui as pag
 import cv2
 import time
 import torch
+from torchrl.data.tensor_specs import DiscreteTensorSpec
 
 ability_names = [
     'Arc Lightning',
@@ -213,6 +214,9 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     return [item[0] for item in sorted_items]
 
 def encode_choices(choices):
+    encoded_choices = [encoder_dict[choice] for choice in choices]
+    td = DiscreteTensorSpec(n=4).rand()
+    print(td)
     return
 
 def check_game_end(image_or_image_path=None):
@@ -221,7 +225,7 @@ def check_game_end(image_or_image_path=None):
     elif isinstance(image_or_image_path, str):
         image = cv2.imread(image_or_image_path)
     else:
-        image = image_or_image_path
+        image = image_or_image_path   
     try:
         pag.locate('images/templates/menu/confirm_button.png', image)
         return True
@@ -267,3 +271,7 @@ def start_dummy_run():
             print('Reward:', check_win_or_loss())
             break
         time.sleep(1)
+
+# encode_choices(get_choices('images/examples/choices.png'))
+# time.sleep(2)
+# screenshot('images/examples/choices_full_screen.png')
