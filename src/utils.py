@@ -216,6 +216,20 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     
     return [item[0] for item in sorted_items]
 
+def check_if_choices(image_or_image_path=None):
+    if image_or_image_path is None:
+        image = screenshot(region=(1550,290, 370, 600))
+    elif isinstance(image_or_image_path, str):
+        image = cv2.imread(image_or_image_path)
+    else:
+        image = image_or_image_path
+
+    try:
+        pag.locate('images/templates/menu/refresh.png', image, confidence=0.8)
+        return True
+    except:
+        return False
+
 def encode_choices(choices):
     encoded_choices = [encoder_dict[choice] for choice in choices]
     td = DiscreteTensorSpec(n=4).rand()
@@ -277,4 +291,7 @@ def start_dummy_run():
 
 # encode_choices(get_choices('images/examples/choices.png'))
 # time.sleep(2)
-# screenshot('images/examples/choices_full_screen.png')
+while True:
+    while not check_if_choices():
+        print('No Choices Found')
+    print('Choices found')
