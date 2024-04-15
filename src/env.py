@@ -31,7 +31,7 @@ class LastSurvivors(EnvBase):
         self.action_spec = DiscreteTensorSpec(4)
         self.state_spec = CompositeSpec( # Encode Level Information Here
             action_mask=BinaryDiscreteTensorSpec(4, dtype=torch.bool))
-        self.observation_spec = CompositeSpec(choices=UnboundedDiscreteTensorSpec(4)) # choices, health info?, level
+        self.observation_spec = CompositeSpec(observation=UnboundedDiscreteTensorSpec(4)) # choices, health info?, level
         self.reward_spec = UnboundedContinuousTensorSpec(1)
 
     def _reset(self, tensordict=None):
@@ -66,7 +66,7 @@ class LastSurvivors(EnvBase):
             done = torch.tensor(False)
 
         td = self.observation_spec.rand()
-        td.set("choices", choices)
+        td.set("observation", choices)
         td.set("action_mask", action_mask)
         td.set("reward", reward)
         td.set("done", done)
@@ -81,17 +81,6 @@ class LastSurvivors(EnvBase):
 #     base_env = LastSurvivors()
 #     env = TransformedEnv(base_env, ActionMask())
 #     r = env.rollout(10)
-#     env = TransformedEnv(base_env, ActionMask())
-#     r = env.rollout(10)
-#     r["action_mask"]
-
-
-# base_env = LastSurvivors
-# env = TransformedEnv(base_env, ActionMask())
-# print(env._reset)
-# env = LastSurvivors()
-# env._step(env)
-
 
 if __name__ == "__main__":
     if True:
