@@ -176,6 +176,9 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         image = screenshot(region=(1550,290, 370, 550))
     elif isinstance(image_or_image_path, str):
         image = cv2.imread(image_or_image_path)
+    else:
+        image = image_or_image_path
+    image = image[290:840, 1550:, :]
     items = {} # rounded y: (name, confidence)
     
     ### Get Choices
