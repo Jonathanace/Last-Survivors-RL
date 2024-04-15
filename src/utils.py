@@ -172,8 +172,10 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     Returns: A list of the names of current choices
     """
     ### Initialize
+    if not check_if_choices():
+        raise Exception("Choices are not present!")
     if image_or_image_path is None:
-        image = screenshot(region=(1550,290, 370, 550))
+        image = screenshot()
     elif isinstance(image_or_image_path, str):
         image = cv2.imread(image_or_image_path)
     else:
@@ -291,7 +293,10 @@ def start_dummy_run():
 
 # encode_choices(get_choices('images/examples/choices.png'))
 # time.sleep(2)
-while True:
-    while not check_if_choices():
-        print('No Choices Found')
-    print('Choices found')
+
+if __name__ == "__main__":
+    get_choices()
+    # while True:
+    #     while not check_if_choices():
+    #         print('No Choices Found')
+    #     print('Choices found')
