@@ -148,16 +148,19 @@ lookUpTable = np.empty((1,256), np.uint8)
 for i in range(256): # populate lookUpTable
     lookUpTable[0,i] = np.clip(pow(i / 255.0, 1.0) * 255.0, 0, 255)
 
-def screenshot(file_path=None, region=None):
+def screenshot(input_path=None, output_path=None, region=None):
     """
     region: a four-integer tuple of the left, top, width, and height of the region to capture
     """
-    screenshot = pag.screenshot(region=region) 
-    image = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
-    gamma_image = cv2.LUT(image, lookUpTable)
-    if file_path:
-        cv2.imwrite(file_path, gamma_image) 
-    return gamma_image
+    if input_path:
+        image = cv2.imread(input_path)
+    else:
+        screenshot = pag.screenshot(region=region) 
+        cvt_image = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+        image = cv2.LUT(cvt_image, lookUpTable)
+    if output_path:
+        cv2.imwrite(output_path, image) 
+    return image
 
 def quickshow(image):
     # pag.alert('Image Ready!', button = 'OK')
