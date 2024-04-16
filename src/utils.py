@@ -123,6 +123,8 @@ other_choice_names = [
 ]
 namespace = ability_names + item_names + other_choice_names 
 
+choices_region = np.s_[290:900, 1550:, :]
+
 icons_dir="images/templates/choices"
 pathlist = Path(icons_dir).rglob('*')
 file_names = {os.path.basename(path)[:-4] for path in pathlist}
@@ -183,7 +185,7 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         image = cv2.imread(image_or_image_path)
     else:
         image = image_or_image_path
-    image = image[290:840, 1550:, :]
+    image = image[choices_region]
     items = {} # rounded y: (name, confidence)
     
     ### Get Choices
@@ -223,12 +225,12 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
 
 def check_if_choices(image_or_image_path=None):
     if image_or_image_path is None:
-        image = screenshot(region=(1550,290, 370, 600))
+        image = screenshot()
     elif isinstance(image_or_image_path, str):
         image = cv2.imread(image_or_image_path)
     else:
         image = image_or_image_path
-
+    image = image[choices_region]
     try:
         pag.locate('images/templates/menu/refresh.png', image, confidence=0.8)
         return True
@@ -298,7 +300,7 @@ def start_dummy_run():
 # time.sleep(2)
 
 if __name__ == "__main__":
-    get_choices()
+    print(get_choices())
     # while True:
     #     while not check_if_choices():
     #         print('No Choices Found')
