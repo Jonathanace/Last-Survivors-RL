@@ -25,6 +25,8 @@ from utils import (
     )
 import cv2
 from tensordict import TensorDict
+from typing import Optional
+
 
 class LastSurvivors(EnvBase):
     def __init__(self, *args, **kwargs):
@@ -107,7 +109,9 @@ class LastSurvivors(EnvBase):
         )
         return td
 
-    def _set_seed(self, seed):
+    def _set_seed(self, seed: Optional[int]):
+        rng = torch.manual_seed(seed)
+        self.rng = rng
         return seed
 
 
