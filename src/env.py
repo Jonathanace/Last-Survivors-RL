@@ -31,7 +31,7 @@ class LastSurvivors(EnvBase):
         super().__init__(*args, **kwargs)
         self.action_spec = BoundedTensorSpec(
             low=1,
-            high=4,
+            high=5,
             shape=(1,),
             dtype=torch.int32,
             )
