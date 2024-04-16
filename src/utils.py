@@ -132,7 +132,7 @@ file_names = {os.path.basename(path)[:-4] for path in pathlist}
 num_files = len(namespace)
 missing_files = 0
 encoder_dict = {}
-
+encoder_dict['None'] = -1
 for i, name in enumerate(namespace):
     encoder_dict[name] = i+1
     if name not in file_names:
@@ -220,6 +220,8 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     if len(sorted_items) < 3:
         print("Choices detected but unrecognized!")
         return False
+    if len(sorted_items) == 3:
+        sorted_items.append(('None', 1.0))
     
     ### Output Results
     if not quiet:
@@ -228,7 +230,7 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         for item in sorted_items:
             print(item)
     
-
+    
     return [item[0] for item in sorted_items]
 
 def check_if_choices(image_or_image_path=None):
