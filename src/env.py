@@ -24,6 +24,7 @@ from utils import (
     check_if_choices
     )
 import cv2
+from tensordict import TensorDict
 
 class LastSurvivors(EnvBase):
     def __init__(self, *args, **kwargs):
@@ -32,13 +33,15 @@ class LastSurvivors(EnvBase):
         self.action_spec = BoundedTensorSpec(
             low=1,
             high=5,
-            shape=(1,),
+            shape=(),
             dtype=torch.int32,
             )
-        self.state_spec = CompositeSpec( # Encode Level Information Here
-            action_mask=BinaryDiscreteTensorSpec(4, dtype=torch.bool))
-        self.observation_spec = CompositeSpec(observation=UnboundedDiscreteTensorSpec(4)) # choices, health info?, level
-        self.reward_spec = UnboundedContinuousTensorSpec(1)
+        self.state_spec = CompositeSpec()
+        self.observation_spec = CompositeSpec(
+            choices=UnboundedDiscreteTensorSpec(4, dtype=torch.uint8),
+            shape=()
+            )
+        self.reward_spec = UnboundedContinuousTensorSpec(1, dtype=torch.uint8)
 
     def _reset(self, tensordict=None):
         sc = screenshot()
@@ -54,16 +57,17 @@ class LastSurvivors(EnvBase):
             raise Exception("Game has ended. Please restart the game manually before beginning training.")
         
         choices = torch.tensor([encoder_dict[choice] for choice in choice_names], dtype=torch.uint8)
-        action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
         reward = torch.tensor(0, dtype=torch.uint8)
         done = torch.tensor(False, dtype=torch.bool)
-
-        td = self.observation_spec.rand()
-        td.set("observation", choices)
-        td.set("action_mask", action_mask)
-        td.set("reward", reward)
-        td.set("done", done)
-        return td
+        out = TensorDict(
+            {
+                "choices": choices,
+                "reward": reward,
+                "done": done,
+            },
+            batch_size=[]
+        )
+        return out
 
     def _step(self, data):
         # Take action
@@ -80,22 +84,27 @@ class LastSurvivors(EnvBase):
         if check_game_end(sc):
             print("Game End Detected")
             choices = torch.tensor([-1, -1, -1, -1], dtype=torch.uint8)
-            action_mask = torch.tensor([False, False, False, False], dtype=torch.bool)
+            # action_mask = torch.tensor([False, False, False, False], dtype=torch.bool)
             reward = torch.tensor(check_win_or_loss(sc), dtype=torch.uint8)
             done = torch.tensor(True, dtype=torch.bool)
 
         elif check_if_choices(sc):
             print("Choices Detected")
             choices = torch.tensor([encoder_dict[choice] for choice in get_choices(sc)], dtype=torch.uint8)
-            action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
+            # action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
             reward = torch.tensor(0, dtype=torch.uint8)
             done = torch.tensor(False, dtype=torch.bool)
 
-        td = self.observation_spec.rand()
-        td.set("observation", choices)
-        td.set("action_mask", action_mask)
-        td.set("reward", reward)
-        td.set("done", done)
+        
+        td = TensorDict(
+            {
+                "choices": choices,
+                "reward": reward,
+                "done": done
+
+            },
+            batch_size=[]
+        )
         return td
 
     def _set_seed(self, seed):
