@@ -221,7 +221,12 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         print("Choices detected but unrecognized!")
         return False
     
-
+    ### Output Results
+    if not quiet:
+        print(f'--- Confidence Threshold: {confidence_threshold} ---')
+        print(f'{len(sorted_items )} choices found')
+        for item in sorted_items:
+            print(item)
     
 
     return [item[0] for item in sorted_items]
