@@ -176,7 +176,6 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     """
     Returns: A list of the names of current choices
     """
-    
     if image_or_image_path is None:
         image = screenshot()
     elif isinstance(image_or_image_path, str):
@@ -185,7 +184,8 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         image = image_or_image_path
     
     if not check_if_choices(image):
-        raise Exception("Choices are not present!")
+        print("Choices are not present!")
+        return False
     
     image = image[choices_region]
     items = {} # rounded y: (name, confidence)
@@ -223,6 +223,9 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     for item in sorted_items:
         print(item)
     
+    if len(sorted_items) < 3:
+        print("Choices detected but unrecognized!")
+        return False
     return [item[0] for item in sorted_items]
 
 def check_if_choices(image_or_image_path=None):
