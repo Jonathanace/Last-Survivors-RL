@@ -88,7 +88,7 @@ item_names = [
     'Hand of Midas',
     'Armlet of Mordiggian',
     'Eternal Shroud',
-    'Quickenign Charm',
+    'Quickening Charm',
     'Veil of Discord',
     'Dagon',
     'Shivas Guard',
