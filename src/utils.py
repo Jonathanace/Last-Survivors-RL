@@ -123,7 +123,7 @@ other_choice_names = [
 ]
 namespace = ability_names + item_names + other_choice_names 
 
-choices_region = np.s_[290:900, 1550:, :]
+choices_region = np.s_[280:850, 1550:, :]
 
 icons_dir="images/templates/choices"
 pathlist = Path(icons_dir).rglob('*')
@@ -183,11 +183,11 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
         image = cv2.imread(image_or_image_path)
     else:
         image = image_or_image_path
-    image = image[choices_region]
-
+    
     if not check_if_choices(image):
         raise Exception("Choices are not present!")
     
+    image = image[choices_region]
     items = {} # rounded y: (name, confidence)
     
     ### Get Choices
