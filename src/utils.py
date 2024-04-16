@@ -172,7 +172,7 @@ def quickshow(image):
     cv2.waitKey(4_000)
     cv2.destroyAllWindows()
 
-def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_threshold=0.70):
+def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_threshold=0.70, quiet=False):
     """
     Returns: A list of the names of current choices
     """
@@ -216,16 +216,14 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
     ### Convert dictionary to list
     positions = sorted(items.keys())
     sorted_items = [items[position] for position in sorted(positions)]
-    
-    ### Output Results
-    print(f'--- Confidence Threshold: {confidence_threshold} ---')
-    print(f'{len(sorted_items )} choices found')
-    for item in sorted_items:
-        print(item)
-    
+
     if len(sorted_items) < 3:
         print("Choices detected but unrecognized!")
         return False
+    
+
+    
+
     return [item[0] for item in sorted_items]
 
 def check_if_choices(image_or_image_path=None):
