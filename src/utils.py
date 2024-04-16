@@ -123,7 +123,7 @@ other_choice_names = [
 ]
 namespace = ability_names + item_names + other_choice_names 
 
-choices_region = np.s_[280:850, 1550:, :]
+choices_region = np.s_[280:950, 1550:, :]
 
 icons_dir="images/templates/choices"
 pathlist = Path(icons_dir).rglob('*')
