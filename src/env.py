@@ -42,13 +42,15 @@ class LastSurvivors(EnvBase):
 
     def _reset(self, tensordict=None):
         sc = screenshot()
-        while not any ([check_if_choices(sc), check_game_end(sc)]):
+        while get_choices(sc, quiet=True) is False and check_game_end(sc) is False:
             print("Checking frame...")
             sc = screenshot()
 
         print("Choices Detected")
-        print(get_choices(sc))
-        choices = torch.tensor([encoder_dict[choice] for choice in get_choices(sc)], dtype=torch.uint8)
+        
+        choice_names = get_choices(sc)
+        
+        choices = torch.tensor([encoder_dict[choice] for choice in choice_names], dtype=torch.uint8)
         action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
         reward = torch.tensor(0, dtype=torch.uint8)
         done = torch.tensor(False, dtype=torch.bool)
@@ -62,13 +64,13 @@ class LastSurvivors(EnvBase):
 
     def _step(self, data):
         # Take action
-        action = str(data.get("action").item()+1)
+        action = str(data.get("action").item())
         print(f'Selected action is {action}')
         pag.press(action)
-        
+        time.sleep(0.5)
         # Get observations
         sc = screenshot()
-        while not any ([check_if_choices(sc),  check_game_end(sc)]): # wait until choices or game end is detected
+        while get_choices(sc, quiet=True) is False and check_game_end(sc) is False: # wait until choices or game end is detected
             print("Checking frame...")
             sc = screenshot()
         
