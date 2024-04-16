@@ -49,6 +49,9 @@ class LastSurvivors(EnvBase):
         print("Choices Detected")
         
         choice_names = get_choices(sc)
+
+        if check_game_end(sc):
+            raise Exception("Game has ended. Please restart the game manually before beginning training.")
         
         choices = torch.tensor([encoder_dict[choice] for choice in choice_names], dtype=torch.uint8)
         action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
