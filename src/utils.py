@@ -132,9 +132,11 @@ file_names = {os.path.basename(path)[:-4] for path in pathlist}
 num_files = len(namespace)
 missing_files = 0
 encoder_dict = {}
-encoder_dict['None'] = -1
+encoder_dict['MAX'] = 0
+encoder_dict['None'] = 0
 for i, name in enumerate(namespace):
-    encoder_dict[name] = i+1
+    if name not in encoder_dict:
+        encoder_dict[name] = i+1
     if name not in file_names:
         missing_files += 1
 
@@ -198,27 +200,41 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
             icon = cv2.imread(str(file_path))
             if icon is not None:
                 name = os.path.basename(file_path)[:-4]
+                if name == 'MAX': # MAX is the only option that can appear multiple times in the image, so we need to multi-template match
+                    result = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
+                    
+                    for y, x in np.where(result > confidence_threshold):
+                        confidence = result[y, x]
+                        rounded_y = round(loc[1]/100, 1)
+                        if rounded_y in items:
+                            old_conf = items[rounded_y][1]
+                            if confidence > old_conf:
+                                items[rounded_y] = (name, confidence)
+                            else:
+                                items[rounded_y] = (name, confidence)
+                else:
+                    # Match Template
+                    res = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
+                    _, confidence, _, loc = cv2.minMaxLoc(res) # min_val, max_val, min_loc, max_loc
 
-                # Match Template
-                res = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
-                _, confidence, _, loc = cv2.minMaxLoc(res) # min_val, max_val, min_loc, max_loc
-
-                # Resolve Collisions
-                if confidence > confidence_threshold:
-                    rounded_y = round(loc[1]/100, 1)
-                    if rounded_y in items: # collision detected
-                        old_conf = items[rounded_y][1]
-                        if confidence > old_conf:
+                    # Resolve Collisions
+                    if confidence > confidence_threshold:
+                        rounded_y = round(loc[1]/100, 1)
+                        if rounded_y in items: # collision detected
+                            old_conf = items[rounded_y][1]
+                            if confidence > old_conf:
+                                items[rounded_y] = (name, confidence)
+                        else: # no collision
                             items[rounded_y] = (name, confidence)
-                    else: # no collision
-                        items[rounded_y] = (name, confidence)
 
     ### Convert dictionary to list
     positions = sorted(items.keys())
     sorted_items = [items[position] for position in sorted(positions)]
 
     if len(sorted_items) < 3:
-        print("Choices detected but unrecognized!")
+        print("Choices detected but can't be recognized!")
+        print('The detected choices are:', sorted_items)
+        quickshow(image)
         return False
     if len(sorted_items) == 3:
         sorted_items.append(('None', 1.0))
