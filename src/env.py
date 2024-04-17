@@ -47,19 +47,19 @@ class LastSurvivors(EnvBase):
 
     def _reset(self, tensordict=None):
         sc = screenshot()
-        while get_choices(sc, quiet=True) is False and check_game_end(sc) is False:
+        while not get_choices(sc, quiet=True) and not check_game_end(sc) is False:
             print("Checking frame...")
             sc = screenshot()
 
         print("Choices Detected")
         
-        choice_names = get_choices(sc)
+        self.choice_names = get_choices(sc)
 
         if check_game_end(sc):
-            raise Exception("Game has ended. Please restart the game manually before beginning training.")
+            print("Game has ended. You may want to restart the game manually before beginning training.")
         
-        choices = torch.tensor([encoder_dict[choice] for choice in choice_names], dtype=torch.float32)
-        reward = torch.tensor(0, dtype=torch.float32)
+        choices = torch.tensor([encoder_dict[choice] for choice in self.choice_names], dtype=torch.float32)
+        reward = torch.tensor(0, dtype=torch.float32, requires_grad=True)
         done = torch.tensor(False, dtype=torch.bool)
         out = TensorDict(
             {
@@ -74,27 +74,35 @@ class LastSurvivors(EnvBase):
     def _step(self, data):
         # Take action
         action = str(int(data.get("action").item())+1)
-        print(f'Selected action is {action}')
+        print(f'Picked {self.choice_names[int(action)-1]}')
         pag.press(action)
+        time.sleep(1)
         # Get observations
         sc = screenshot()
-        while get_choices(sc, quiet=True) is False and check_game_end(sc) is False: # wait until choices or game end is detected
+        while (not get_choices(sc, quiet=True)) and (not check_game_end(sc)): # wait until choices or game end is detected
             print("Checking frame...")
-            time.sleep(1)
+            time.sleep(0.1)
             sc = screenshot()
         
         if check_game_end(sc):
             print("Game End Detected")
             choices = torch.tensor([-1, -1, -1, -1], dtype=torch.float32)
-            # action_mask = torch.tensor([False, False, False, False], dtype=torch.bool)
-            reward = torch.tensor(check_win_or_loss(sc), dtype=torch.float32)
+            reward = torch.tensor(check_win_or_loss(sc), dtype=torch.float32, requires_grad=True)
             done = torch.tensor(True, dtype=torch.bool)
 
         elif check_if_choices(sc):
-            print("Choices Detected")
-            choices = torch.tensor([encoder_dict[choice] for choice in get_choices(sc)], dtype=torch.float32)
-            # action_mask = torch.tensor([True] * len(choices) + [False] * (4-len(choices)), dtype=torch.bool)
-            reward = torch.tensor(0, dtype=torch.float32)
+            print("Choices Detected") 
+            
+            # Double check that choices haven't changed
+            self.choice_names = get_choices(sc)
+            new_choice_names = get_choices()
+            while new_choice_names and new_choice_names != self.choice_names:
+                print('Choice mismatch')
+                self.choice_names=new_choice_names
+                new_choice_names=get_choices()
+
+            choices = torch.tensor([encoder_dict[choice] for choice in self.choice_names], dtype=torch.float32)
+            reward = torch.tensor(0, dtype=torch.float32, requires_grad=True)
             done = torch.tensor(False, dtype=torch.bool)
 
         
