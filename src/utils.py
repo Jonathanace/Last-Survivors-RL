@@ -202,8 +202,8 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
                 name = os.path.basename(file_path)[:-4]
                 if name == 'MAX': # MAX is the only option that can appear multiple times in the image, so we need to multi-template match
                     result = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
-                    
-                    for y, x in np.where(result > confidence_threshold):
+                    Ys, Xs = np.where(result > confidence_threshold)
+                    for x, y in zip(Xs, Ys):
                         confidence = result[y, x]
                         rounded_y = round(loc[1]/100, 1)
                         if rounded_y in items:
