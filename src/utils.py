@@ -328,7 +328,9 @@ def exit_stage(stage_number):
         - dota_camera_set_lookatpos
 
     """
-    pag.press(console_button)
+    pag.press(console_button) # open the console
+    
+    # write the command to move the camera to the correct location
     if stage_number == 1:
         # TODO
         pass
@@ -338,12 +340,52 @@ def exit_stage(stage_number):
     elif stage_number == 3:
         pag.typewrite("dota_camera_set_lookatpos 11035.911133 11882")
         pass
-    pag.press('enter')
-    pag.rightClick(979, 561)
+    pag.press('enter') # enter the command and exit the console
+    pag.rightClick(979, 561) # click the center of the screen to exit the game
 
+def start_stage(stage: str,  difficulty: str, level: str, speed: str, confidence_threshold=0.7, duration=2):
+    stages = {
+        'mystic island': 1,
+        'the underworld': 2,
+        'tomb of the ancestors': 3,
+    }
+    difficulties = {
+        'easy': 1,
+        'normal': 2,
+        'hard': 3,
+        'expert': 4,
+        'master': 5,
+        'hell': 6
+    }
+
+    
+
+    stage_path = 'images/templates/menu/stages/'+stage+'.png'
+    difficulty_path = 'images/templates/menu/difficulties/'+difficulty+'.png'
+    level_path = 'images/templates/menu/levels/'+level+'.png'
+    speed_path = 'images/templates/menu/speeds/'+speed+'.png'
+
+    for image_path in stage_path, difficulty_path, level_path, speed_path:
+        template = cv2.imread(image_path)
+        if stage != 'tomb of the ancestors' and image_path == speed_path:
+            continue
+        template_loc = pag.locateOnScreen(image_path, confidence=confidence_threshold)
+        if template is None:
+            raise Exception(f'{image_path} is empty!')
+        pag.click(template_loc, duration=duration)
+    confirm_loc = pag.locateOnScreen('images/templates/menu/confirm_button.png', confidence=confidence_threshold)
+    pag.click(confirm_loc, duration=duration)
+        
+
+    print('Done!')
+    return stages[stage], difficulties[difficulty], int(level), int(speed) # return dictionary of encoded choices
+    
+    
 if __name__ == "__main__":
-    time.sleep(1)
-    exit_stage(3)
+    # start_stage()
+    # time.sleep(2)
+    start_stage('tomb of the ancestors', 'easy', '1', '2')
+    
     # while True:
     #     while not check_if_choices():
     #         print('No Choices Found')
