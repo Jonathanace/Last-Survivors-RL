@@ -343,7 +343,17 @@ def exit_stage(stage_number):
     pag.press('enter') # enter the command and exit the console
     pag.rightClick(979, 561) # click the center of the screen to exit the game
 
-def start_stage(stage: str,  difficulty: str, level: str, speed: str, confidence_threshold=0.7, duration=2):
+def console_command(command):
+    pag.press(console_button)
+    time.sleep(1)
+    pag.typewrite(command)
+    pag.press('enter')
+    pag.press(console_button)
+
+def set_camera_pos(pos):
+    console_command(f'dota_camera_set_lookatpos {pos}')
+
+def start_stage(hero: str, stage: str,  difficulty: str, level: str, speed: str, confidence_threshold=0.7, duration=2):
     stages = {
         'mystic island': 1,
         'the underworld': 2,
@@ -357,9 +367,15 @@ def start_stage(stage: str,  difficulty: str, level: str, speed: str, confidence
         'master': 5,
         'hell': 6
     }
-
     
+    # Open Menu
+    set_camera_pos('-14106.488281 1218.668579')
+    time.sleep(1)
+    pag.rightClick(1920//2, 1080//2)
+    time.sleep(1)
 
+    # Select Stage
+    hero_path = 'images/templates/menu/heroes/'+hero+'.png'
     stage_path = 'images/templates/menu/stages/'+stage+'.png'
     difficulty_path = 'images/templates/menu/difficulties/'+difficulty+'.png'
     level_path = 'images/templates/menu/levels/'+level+'.png'
@@ -367,15 +383,32 @@ def start_stage(stage: str,  difficulty: str, level: str, speed: str, confidence
 
     for image_path in stage_path, difficulty_path, level_path, speed_path:
         template = cv2.imread(image_path)
-        if stage != 'tomb of the ancestors' and image_path == speed_path:
+        if stage == 'tomb of the ancestors' and image_path == speed_path:
+            print('skipping speed due to stage')
             continue
         template_loc = pag.locateOnScreen(image_path, confidence=confidence_threshold)
         if template is None:
             raise Exception(f'{image_path} is empty!')
         pag.click(template_loc, duration=duration)
+
+    # Click Confirm
     confirm_loc = pag.locateOnScreen('images/templates/menu/confirm_button.png', confidence=confidence_threshold)
     pag.click(confirm_loc, duration=duration)
-        
+
+    # Start the stage
+    set_camera_pos('-13823.368164 995.561890')
+    time.sleep(1)
+    pag.rightClick(x=1920//2, y=1080//2)
+    time.sleep(5)
+
+    # Hero select
+    hero_loc = pag.locateOnScreen(hero_path, confidence=confidence_threshold)
+    pag.click(hero_loc, duration=duration)
+    
+    # Press Fight
+    fight_button_path = 'images/templates/menu/fight.png'
+    fight_loc = pag.locateOnScreen(fight_button_path, confidence=confidence_threshold)
+    pag.click(fight_loc, duration=duration)
 
     print('Done!')
     return stages[stage], difficulties[difficulty], int(level), int(speed) # return dictionary of encoded choices
@@ -384,7 +417,7 @@ def start_stage(stage: str,  difficulty: str, level: str, speed: str, confidence
 if __name__ == "__main__":
     # start_stage()
     # time.sleep(2)
-    start_stage('tomb of the ancestors', 'easy', '1', '2')
+    start_stage('Drow Ranger', 'tomb of the ancestors', 'easy', '1', '2')
     
     # while True:
     #     while not check_if_choices():
