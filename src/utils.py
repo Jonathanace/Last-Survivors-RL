@@ -5,6 +5,8 @@ a new choice to the end.
 Remember to restart the kernel if you modify this.
 """
 
+console_button = '\\'
+
 from pathlib import Path
 import os
 import numpy as np
@@ -319,18 +321,30 @@ def start_dummy_run():
             break
         time.sleep(1)
 
-# encode_choices(get_choices('images/examples/choices.png'))
-# time.sleep(2)
+def exit_stage(stage_number):
+    """
+    Useful dota console commands:
+        - dota_camera_get_lookatpos 
+        - dota_camera_set_lookatpos
+
+    """
+    pag.press(console_button)
+    if stage_number == 1:
+        # TODO
+        pass
+    elif stage_number ==2:
+        # TODO
+        pass
+    elif stage_number == 3:
+        pag.typewrite("dota_camera_set_lookatpos 11035.911133 11882")
+        pass
+    pag.press('enter')
+    pag.rightClick(979, 561)
 
 if __name__ == "__main__":
-    print(get_choices())
+    time.sleep(1)
+    exit_stage(3)
     # while True:
     #     while not check_if_choices():
     #         print('No Choices Found')
     #     print('Choices found')
-
-"""
-TODO: 
-implement dota_camera_get_lookatpos			
-implement dota_camera_get_pos
-"""
