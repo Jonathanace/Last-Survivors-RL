@@ -327,9 +327,7 @@ def exit_stage(stage_number):
         - dota_camera_get_lookatpos 
         - dota_camera_set_lookatpos
 
-    """
-    pag.press(console_button) # open the console
-    
+    """    
     # write the command to move the camera to the correct location
     if stage_number == 1:
         # TODO
@@ -338,9 +336,8 @@ def exit_stage(stage_number):
         # TODO
         pass
     elif stage_number == 3:
-        pag.typewrite("dota_camera_set_lookatpos 11035.911133 11882")
-        pass
-    pag.press('enter') # enter the command and exit the console
+        set_camera_pos("11035.911133 11882")
+        
     pag.rightClick(979, 561) # click the center of the screen to exit the game
 
 def console_command(command):
@@ -366,6 +363,9 @@ def start_stage(hero: str, stage: str,  difficulty: str, level: str, speed: str,
         'expert': 4,
         'master': 5,
         'hell': 6
+    }
+    heroes = {
+        'Drow Ranger': 0
     }
     
     # Open Menu
@@ -411,7 +411,7 @@ def start_stage(hero: str, stage: str,  difficulty: str, level: str, speed: str,
     pag.click(fight_loc, duration=duration)
 
     print('Done!')
-    return stages[stage], difficulties[difficulty], int(level), int(speed) # return dictionary of encoded choices
+    return heroes[hero], stages[stage], difficulties[difficulty], int(level), int(speed) # return dictionary of encoded choices
     
     
 if __name__ == "__main__":
