@@ -1,22 +1,79 @@
-from torchrl.modules import Actor, MLP, ValueOperator
-from torchrl.objectives import DDPGLoss
-from torchrl.envs.transforms import ActionMask, TransformedEnv
+"""
+An example training loop for the LastSurvivors environment. 
+Adapted from this example: https://pytorch.org/tutorials/advanced/pendulum.html#training-a-simple-policy
+"""
 
+import torch
+from torch import nn
+from tensordict.nn import TensorDictModule
+import tqdm
+from collections import defaultdict
 
 from env import LastSurvivors
+env = LastSurvivors('Drow Ranger', 'tomb of the ancestors', 'expert', '1', '2')
 
-base_env = LastSurvivors()
-env = TransformedEnv(base_env, ActionMask())
+torch.manual_seed(0)
+env.set_seed(0)
 
-n_obs = 4
-n_act = 1
-actor = Actor(MLP(in_features=n_obs, out_features=n_act, num_cells=[32, 32]))
-value_net = ValueOperator(
-    MLP(in_features=n_obs + n_act, out_features=1, num_cells=[32, 32]),
-    in_keys=["choices", "action"],
+net = nn.Sequential(
+    nn.LazyLinear(64),
+    nn.Tanh(),
+    # nn.LazyLinear(64),
+    # nn.Tanh(),
+    # nn.LazyLinear(64),
+    # nn.Tanh(),
+    nn.LazyLinear(1),
+)
+policy = TensorDictModule(
+    net,
+    in_keys=["choices"],
+    out_keys=["action"],
 )
 
-ddpg_loss = DDPGLoss(actor_network=actor, value_network=value_net)
+optim = torch.optim.Adam(policy.parameters(), lr=2e-3)
 
-rollout = env.rollout(max_steps=100, policy=actor)
-loss_vals = ddpg_loss(rollout)
+batch_size = 1
+n_episodes = 10
+pbar = tqdm.tqdm(range(n_episodes // batch_size))
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, 20_000)
+logs = defaultdict(list)
+
+for _ in pbar:
+    rollout = env.rollout(100, policy)
+    traj_return = rollout["next", "reward"].mean()
+    (-traj_return).backward()
+    gn = torch.nn.utils.clip_grad_norm_(net.parameters(), 1.0)
+    optim.step()
+    optim.zero_grad()
+    pbar.set_description(
+        f"reward: {traj_return: 4.4f}, "
+        f"last reward: {rollout[..., -1]['next', 'reward'].mean(): 4.4f}, gradient norm: {gn: 4.4}"
+    )
+    logs["return"].append(traj_return.item())
+    logs["last_reward"].append(rollout[..., -1]["next", "reward"].mean().item())
+    scheduler.step()
+
+def plot():
+    import matplotlib
+    from matplotlib import pyplot as plt
+
+    is_ipython = "inline" in matplotlib.get_backend()
+    if is_ipython:
+        from IPython import display
+
+    with plt.ion():
+        plt.figure(figsize=(10, 5))
+        plt.subplot(1, 2, 1)
+        plt.plot(logs["return"])
+        plt.title("returns")
+        plt.xlabel("iteration")
+        plt.subplot(1, 2, 2)
+        plt.plot(logs["last_reward"])
+        plt.title("last reward")
+        plt.xlabel("iteration")
+        if is_ipython:
+            display.display(plt.gcf())
+            display.clear_output(wait=True)
+        plt.show(block=True)
+
+plot()
