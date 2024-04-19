@@ -203,14 +203,18 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
             if icon is not None:
                 name = os.path.basename(file_path)[:-4]
                 if name == 'MAX': # MAX is the only option that can appear multiple times in the image, so we need to multi-template match
-                    result = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
-                    Ys, Xs = np.where(result > confidence_threshold)
+                    print('Checking MAX')
+                    confidences = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
+                    Ys, Xs = np.where(confidences > confidence_threshold)
                     for x, y in zip(Xs, Ys) :
-                        confidence = result[y, x]
-                        rounded_y = round(loc[1]/100, 1)
-                        if rounded_y in items:
-                            old_conf = items[rounded_y][1]
-                            items[rounded_y] = 1.0
+                        confidence = confidences[y, x]
+                        print(f'MAX confidence: {confidence}')
+                        rounded_y = round(y/100, 1)
+                        # old_conf = items[rounded_y][1]
+                        if rounded_y in items and items[rounded_y][0] == 'MAX':
+                            items[rounded_y] = ('MAX', max(confidence, items[rounded_y][1]))
+                        else:
+                            items[rounded_y] = ('MAX', confidence)
                 else:
                     # Match Template
                     res = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
@@ -412,12 +416,11 @@ def start_stage(hero: str, stage: str,  difficulty: str, level: str, speed: str,
 
     print('Done!')
     return heroes[hero], stages[stage], difficulties[difficulty], int(level), int(speed) # return dictionary of encoded choices
-    
-    
+  
 if __name__ == "__main__":
     # start_stage()
     # time.sleep(2)
-    start_stage('Drow Ranger', 'tomb of the ancestors', 'easy', '1', '2')
+    get_choices()
     
     # while True:
     #     while not check_if_choices():
