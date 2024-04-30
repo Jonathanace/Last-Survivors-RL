@@ -5,12 +5,13 @@ a new choice to the end.
 Remember to restart the kernel if you modify this.
 """
 
-console_button = '\\'
+console_button = '/'
 
 from pathlib import Path
 import os
 import numpy as np
 import pyautogui as pag
+from pydirectinput import press, write
 import cv2
 import time
 import torch
@@ -203,7 +204,7 @@ def get_choices(image_or_image_path=None, icons_dir=icons_dir, confidence_thresh
             if icon is not None:
                 name = os.path.basename(file_path)[:-4]
                 if name == 'MAX': # MAX is the only option that can appear multiple times in the image, so we need to multi-template match
-                    print('Checking MAX')
+                    # print('Checking MAX')
                     confidences = cv2.matchTemplate(image, icon, cv2.TM_CCOEFF_NORMED)
                     Ys, Xs = np.where(confidences > confidence_threshold)
                     for x, y in zip(Xs, Ys) :
@@ -345,11 +346,12 @@ def exit_stage(stage_number):
     pag.rightClick(979, 561) # click the center of the screen to exit the game
 
 def console_command(command):
-    pag.press(console_button)
+    print(f'console command: {command}')
+    press(console_button)
     time.sleep(1)
     pag.typewrite(command)
-    pag.press('enter')
-    pag.press(console_button)
+    press('enter')
+    press(console_button)
 
 def set_camera_pos(pos):
     console_command(f'dota_camera_set_lookatpos {pos}')
@@ -420,8 +422,13 @@ def start_stage(hero: str, stage: str,  difficulty: str, level: str, speed: str,
 if __name__ == "__main__":
     # start_stage()
     # time.sleep(2)
-    get_choices()
-    
+    time.sleep(1)
+    # start_stage('Drow Ranger', 'tomb of the ancestors', 'expert', '1', '2')
+    # pag.press('/')
+    start_stage('Drow Ranger', "the underworld", "easy", "1", "2")
+    # time.sleep(2)
+    print('Done!')
+    # pag.alert('Done!')
     # while True:
     #     while not check_if_choices():
     #         print('No Choices Found')
