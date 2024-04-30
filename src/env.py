@@ -1,6 +1,7 @@
 import torch
 import time
 import pyautogui as pag
+from pydirectinput import press
 from torchrl.data.tensor_specs import (
     DiscreteTensorSpec, 
     BinaryDiscreteTensorSpec, 
@@ -88,7 +89,7 @@ class LastSurvivors(EnvBase):
         # Take action
         action = str(int(data.get("action").item())+1)
         print(f'Picked {self.choice_names[int(action)-1]}')
-        pag.press(action)
+        press(action)
         time.sleep(1)
         # Get observations
         sc = screenshot()
