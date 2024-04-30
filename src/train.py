@@ -2,6 +2,7 @@
 An example training loop for the LastSurvivors environment. 
 Adapted from this example: https://pytorch.org/tutorials/advanced/pendulum.html#training-a-simple-policy
 """
+print("\033c") # clear the terminal
 
 import torch
 from torch import nn
@@ -33,7 +34,7 @@ policy = TensorDictModule(
 optim = torch.optim.Adam(policy.parameters(), lr=2e-3)
 
 batch_size = 1
-n_episodes = 10
+n_episodes = 2
 pbar = tqdm.tqdm(range(n_episodes // batch_size))
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optim, 20_000)
 logs = defaultdict(list)
