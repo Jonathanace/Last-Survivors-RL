@@ -18,7 +18,7 @@ Note: Since menu options are selected through the detection of visual elements (
 - If a desired choice is missing, it can be implemented by uploading a picture of the choice's menu element into the parameter's corresponding directory.
 - For example, if I wanted to implement selecting the hero "Sniper", save a screenshot of Sniper's menu element to `images/templates/menu/heroes/` as `Sniper.png`.
 
-### Training Policies
+## Training Policies
 Any compatible reinforcement learning algorithm that can be implemented in PyTorch's TorchRL can be used with the `LastSurvivors` environment. 
 
 A sample training loop can be found in `src/train.py`. Other examples can be found [here](https://pytorch.org/rl/stable/index.html). 
