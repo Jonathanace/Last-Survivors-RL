@@ -1,5 +1,5 @@
 # Last Survivors Reinforcement Learning
-This project provides a TorchRL reinforcement learning (RL) environment for the _Dota 2_ arcade game Last Survivors, along with other utilities used to interact with the game. 
+This project provides a TorchRL reinforcement learning (RL) environment for the _Dota 2_ arcade game _Last Survivors_, along with other utilities used to interact with the game. 
 
 ## Installation
 Prerequisites can found in `requirements.txt` and can be installed with `pip install -r requirements.txt` if the user has pip installed. 
